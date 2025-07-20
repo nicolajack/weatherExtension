@@ -11,7 +11,7 @@ async function getLocation() {
                     });
                 },
                 (error) => {
-                    console.log("Geolocation error:", error);
+                    console.log("geolocation error:", error);
                     resolve({
                         lat: 42.3505,
                         lon: -71.1054
@@ -19,7 +19,7 @@ async function getLocation() {
                 }
             );
         } else {
-            console.log("Geolocation is not supported by this browser.");
+            console.log("geolocation is not supported by this browser.");
             resolve({
                 lat: 42.3505,
                 lon: -71.1054
@@ -32,7 +32,7 @@ async function fetchWeather() {
     try {
         const coords = await getLocation();
         const location = coords.lat + "," + coords.lon;
-        console.log("Location: " + location);
+        console.log("location: " + location);
 
         const q = location;
         const url = `https://api.weatherapi.com/v1/current.json?key=${API_KEY}&q=${q}&aqi=no`;
@@ -47,19 +47,30 @@ async function fetchWeather() {
             location: data.location.name,
             temp_f: data.current.temp_f,
             condition: data.current.condition.text,
-            icon: data.current.condition.icon
+            icon: data.current.condition.icon,
+            is_day: data.current.is_day
         };
         
         document.getElementById("location").innerText = weather.location;
-        document.getElementById("temperature").innerText = weather.temp_f + "°F";
+        document.getElementById("temperature").innerText = weather.temp_f + "°f";
         document.getElementById("condition").innerText = weather.condition;
         document.getElementById("icon").src = "https:" + weather.icon;
         document.getElementById("icon").style.display = "block";
+        
+        if (!weather.is_day) {
+            document.body.style.backgroundColor = "#2b2d42";
+        } else if (weather.condition.includes("Rain") || weather.condition.includes("Snow")) {
+            document.body.style.backgroundColor = "#a0c4ff";
+        } else if (weather.condition.includes("Sunny") || weather.condition.includes("Clear")) {
+            document.body.style.backgroundColor = "#F6D99B";
+        } else {
+            document.body.style.backgroundColor = "#ffffff";
+        }
     } catch (error) {
-        console.error("Error fetching weather:", error);
-        document.getElementById("location").innerText = "Error loading location";
-        document.getElementById("temperature").innerText = "Error loading temperature";
-        document.getElementById("condition").innerText = "Error loading condition";
+        console.error("error fetching weather:", error);
+        document.getElementById("location").innerText = "error loading location";
+        document.getElementById("temperature").innerText = "error loading temperature";
+        document.getElementById("condition").innerText = "error loading condition";
     }
 }
 
